@@ -77,10 +77,13 @@ if st.button("🔍 Consultar", type="primary"):
         with st.spinner("Buscando dados..."):
             resultados = []
             erros = []
+            token = st.secrets.get("BRAPI_TOKEN", "")
             for ticker in tickers:
                 try:
+                    params = {"token": token} if token else {}
                     resp = requests.get(
                         f"https://brapi.dev/api/quote/{ticker}",
+                        params=params,
                         timeout=10,
                     )
                     data = resp.json()
@@ -106,7 +109,8 @@ if st.button("🔍 Consultar", type="primary"):
             st.warning(f"Não foi possível obter dados para: {', '.join(erros)}")
 
 st.markdown("---")
-st.info(
-    "ℹ️ A API gratuita da brapi.dev tem limites de uso. Para uso mais intenso, "
-    "considere obter um token gratuito em [brapi.dev](https://brapi.dev)."
-)
+if not st.secrets.get("BRAPI_TOKEN", ""):
+    st.info(
+        "ℹ️ A API gratuita da brapi.dev tem limites de uso. Para uso mais intenso, "
+        "considere obter um token gratuito em [brapi.dev](https://brapi.dev)."
+    )
